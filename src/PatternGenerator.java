@@ -6,19 +6,45 @@ import java.io.IOException;
 public class PatternGenerator {
     static Random random = new Random();
     private static int matrixSize = 10;
-    private static int patternAmout = 20;
+    private static int patternAmout = 100;
     private static int[][] matrix = new int[matrixSize][matrixSize];
-    private static String filepath = "files\\";
-    private static String x = "1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23;24;25;26;27;28;29;30;31;32;33;34;35;36;37;38;39;40;41;42;43;44;45;46;47;48;49;50;51;52;53;54;55;56;57;58;59;60;61;62;63;64;65;66;67;68;69;70;71;72;73;74;75;76;77;78;79;80;81;82;83;84;85;86;87;88;89;90;91;92;93;94;95;96;97;98;99;100";
+    private static String inputFilepath = "";
+    private static String outputFilepath = "";
+    private static String inputNeurons = "1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23;24;25;26;27;28;29;30;31;32;33;34;35;36;37;38;39;40;41;42;43;44;45;46;47;48;49;50;51;52;53;54;55;56;57;58;59;60;61;62;63;64;65;66;67;68;69;70;71;72;73;74;75;76;77;78;79;80;81;82;83;84;85;86;87;88;89;90;91;92;93;94;95;96;97;98;99;100";
+    private static String outputNeurons = "131;132;133";
 
     public static void main(String[] args) {
-        filepath = generateNewFile();
-        printToFile(x + "\n");
+        inputFilepath = generateNewFile(true);
+        outputFilepath = generateNewFile(false);
+        printToFile(true, inputNeurons + "\n");
+        printToFile(false, outputNeurons + "\n");
+
         for (int i = 0; i < patternAmout; i++) {
             initializeMatrix();
-            generateSquare();
+            int rand = random.nextInt(3);
+            String outputPattern = "";
+
+            switch (rand) {
+                case 0:
+                    generateSquare();
+                    outputPattern = "1;0;0";
+                    break;
+                case 1:
+                    generateTriangle();
+                    outputPattern = "0;1;0";
+                    break;
+                case 2:
+                    generateCircle();
+                    outputPattern = "0;0;1";
+                    break;
+                case 3:
+                    generateRandom();
+                    outputPattern = "0;0;0";
+                    break;
+            }
             printMatrix();
-            printToFile(tooString() + "\n");
+            printToFile(true, tooString() + "\n");
+            printToFile(false, outputPattern + "\n");
         }
     }
 
@@ -48,6 +74,45 @@ public class PatternGenerator {
         }
     }
 
+    private static void generateRandom() {
+        for (int i = 0; i < matrixSize; i++) {
+            for (int j = 0; j < matrixSize; j++) {
+                matrix[i][j] = random.nextInt(2);
+            }
+        }
+    }
+
+    private static void generateTriangle() {
+        // int numTriangles = random.nextInt(6) + 3;
+        // for (int t = 0; t < numTriangles; t++) {
+        int baseSize = random.nextInt(9) + 2; // Basis zwischen 2 und 4
+        int row = random.nextInt(matrixSize - baseSize + 1);
+        int col = random.nextInt(matrixSize - baseSize + 1);
+
+        for (int i = 0; i < baseSize; i++) {
+            for (int j = 0; j <= i; j++) {
+                if (row + i < matrixSize && col + j < matrixSize) {
+                    matrix[row + i][col + j] = 1;
+                }
+            }
+        }
+        // }
+    }
+
+    private static void generateCircle() {
+        int radius = random.nextInt(4) + 1;
+        int centerX = random.nextInt(matrixSize - 2 * radius) + radius;
+        int centerY = random.nextInt(matrixSize - 2 * radius) + radius;
+
+        for (int i = 0; i < matrixSize; i++) {
+            for (int j = 0; j < matrixSize; j++) {
+                if (Math.pow(i - centerX, 2) + Math.pow(j - centerY, 2) <= Math.pow(radius, 2)) {
+                    matrix[i][j] = 1;
+                }
+            }
+        }
+    }
+
     private static String tooString() {
         String output = "";
         for (int i = 0; i < matrixSize; i++) {
@@ -70,7 +135,8 @@ public class PatternGenerator {
         }
     }
 
-    private static void printToFile(String text) {
+    private static void printToFile(Boolean isInput, String text) {
+        String filepath = isInput ? inputFilepath : outputFilepath;
         try {
             FileWriter writer = new FileWriter(filepath, true);
             writer.write(text);
@@ -82,18 +148,21 @@ public class PatternGenerator {
         }
     }
 
-    private static String generateNewFile() {
-        String name = "rawinput";
+    private static String generateNewFile(Boolean isInput) {
+        String inputName = "rawinput";
+        String outputName = "rawoutput";
         String extension = ".csv";
         int count = 1;
+        String name = isInput ? inputName : outputName;
+        String path = "files\\";
 
         try {
-            File directory = new File(filepath);
+            File directory = new File(path);
             if (!directory.exists()) {
                 directory.mkdirs();
             }
 
-            while (new File(filepath + name + count + extension).exists()) {
+            while (new File(path + name + count + extension).exists()) {
                 count++;
             }
         } catch (Exception e) {
@@ -101,7 +170,7 @@ public class PatternGenerator {
             e.printStackTrace();
         }
 
-        String filename = filepath + name + count + extension;
+        String filename = path + name + count + extension;
         return filename;
     }
 }
