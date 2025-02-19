@@ -27,7 +27,7 @@ public class PatternGenerator {
 
             switch (rand) {
                 case 0:
-                    generateSquare();
+                    generateRectangle();
                     outputPattern = "1;0;0";
                     break;
                 case 1:
@@ -68,7 +68,7 @@ public class PatternGenerator {
         return tmp;
     }
 
-    private static void generateSquare() {
+    private static void generateRectangle() {
         int startX = random.nextInt(matrixSize - 2);
         int startY = random.nextInt(matrixSize - 2);
 
